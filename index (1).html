@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow — To-Do List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-icon">✦</span>
+        <span class="brand-name">TaskFlow</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-label">Views</span>
+        <button class="nav-item active" data-filter="all">
+          <span class="nav-icon">◈</span> All Tasks
+          <span class="nav-count" id="countAll">0</span>
+        </button>
+        <button class="nav-item" data-filter="active">
+          <span class="nav-icon">◉</span> Active
+          <span class="nav-count" id="countActive">0</span>
+        </button>
+        <button class="nav-item" data-filter="completed">
+          <span class="nav-icon">◎</span> Completed
+          <span class="nav-count" id="countCompleted">0</span>
+        </button>
+        <button class="nav-item" data-filter="high">
+          <span class="nav-icon">◆</span> High Priority
+          <span class="nav-count" id="countHigh">0</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-section">
+        <span class="nav-label">Categories</span>
+        <button class="nav-item" data-filter="cat-work">
+          <span class="cat-dot work"></span> Work
+        </button>
+        <button class="nav-item" data-filter="cat-personal">
+          <span class="cat-dot personal"></span> Personal
+        </button>
+        <button class="nav-item" data-filter="cat-urgent">
+          <span class="cat-dot urgent"></span> Urgent
+        </button>
+        <button class="nav-item" data-filter="cat-other">
+          <span class="cat-dot other"></span> Other
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="progress-block">
+          <div class="progress-header">
+            <span>Overall progress</span>
+            <span id="progressPct">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+        <button class="clear-btn" id="clearCompletedBtn">Clear completed</button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="page-title" id="pageTitle">All Tasks</h1>
+          <p class="page-subtitle" id="pageSubtitle">Manage everything in one place</p>
+        </div>
+        <div class="topbar-right">
+          <div class="search-wrap">
+            <svg class="search-ico" viewBox="0 0 20 20" fill="none">
+              <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search tasks…" />
+          </div>
+          <select class="sort-select" id="sortSelect">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="priority">Priority</option>
+            <option value="az">A → Z</option>
+            <option value="due">Due date</option>
+          </select>
+        </div>
+      </header>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-val" id="statTotal">0</span>
+          <span class="stat-lbl">Total</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-val accent" id="statDone">0</span>
+          <span class="stat-lbl">Done</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-val" id="statLeft">0</span>
+          <span class="stat-lbl">Remaining</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-val danger" id="statOverdue">0</span>
+          <span class="stat-lbl">Overdue</span>
+        </div>
+      </div>
+
+      <div class="add-panel" id="addPanel">
+        <div class="add-panel-row">
+          <input type="text" id="taskInput" class="task-input-field" placeholder="What needs to be done?" autocomplete="off" />
+          <button class="add-submit-btn" id="addBtn">+ Add Task</button>
+        </div>
+        <div class="add-panel-meta">
+          <select class="meta-select" id="prioritySelect">
+            <option value="low">↑ Low priority</option>
+            <option value="medium" selected>↑↑ Medium priority</option>
+            <option value="high">↑↑↑ High priority</option>
+          </select>
+          <select class="meta-select" id="categorySelect">
+            <option value="other">Other</option>
+            <option value="work">Work</option>
+            <option value="personal">Personal</option>
+            <option value="urgent">Urgent</option>
+          </select>
+          <input type="date" class="meta-select" id="dueInput" title="Due date" />
+          <input type="text" class="meta-select" id="noteInput" placeholder="Add a note…" />
+        </div>
+      </div>
+
+      <div class="bulk-bar" id="bulkBar">
+        <span id="bulkLabel">0 selected</span>
+        <div class="bulk-actions">
+          <button class="bulk-btn" id="bulkComplete">Mark done</button>
+          <button class="bulk-btn warn" id="bulkDelete">Delete selected</button>
+          <button class="bulk-btn muted" id="bulkClear">Cancel</button>
+        </div>
+      </div>
+
+      <section class="task-section">
+        <ul class="task-list" id="taskList"></ul>
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">✦</div>
+          <p class="empty-title">All clear!</p>
+          <p class="empty-sub">Add a task above to get started.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Task</h2>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <label class="modal-label">Task</label>
+        <input type="text" class="modal-input" id="editText" />
+        <label class="modal-label">Note</label>
+        <input type="text" class="modal-input" id="editNote" placeholder="Optional note…" />
+        <div class="modal-row">
+          <div class="modal-field">
+            <label class="modal-label">Priority</label>
+            <select class="modal-select" id="editPriority">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <label class="modal-label">Category</label>
+            <select class="modal-select" id="editCategory">
+              <option value="other">Other</option>
+              <option value="work">Work</option>
+              <option value="personal">Personal</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <label class="modal-label">Due date</label>
+            <input type="date" class="modal-select" id="editDue" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-cancel" id="modalCancel">Cancel</button>
+        <button class="modal-save" id="modalSave">Save changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
